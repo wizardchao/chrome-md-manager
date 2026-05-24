@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 320px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; }
+    .header { background: linear-gradient(135deg, #4285f4, #34a853); color: white; padding: 20px; text-align: center; }
+    .header h1 { font-size: 16px; margin-bottom: 4px; }
+    .header p { font-size: 12px; opacity: 0.85; }
+    .actions { padding: 16px; }
+    .btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+    .btn-primary { background: #4285f4; color: white; }
+    .btn-primary:hover { background: #3367d6; }
+    .btn-secondary { background: white; color: #333; border: 1px solid #dadce0; }
+    .btn-secondary:hover { background: #f1f3f4; }
+
+    .shortcuts-section { padding: 0 16px 12px; }
+    .shortcuts-title { font-size: 11px; color: #5f6368; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .shortcut-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px; background: white; border: 1px solid #e8eaed; border-radius: 6px;
+      margin-bottom: 6px; font-size: 12px;
+    }
+    .shortcut-row .label { color: #5f6368; }
+    .shortcut-row .keys { display: flex; gap: 3px; }
+    .shortcut-row .key {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 22px; height: 20px; padding: 0 5px;
+      background: #f8f9fa; border: 1px solid #dadce0; border-radius: 3px;
+      font-family: 'SF Mono', Consolas, monospace; font-size: 10px; font-weight: 600; color: #333;
+    }
+    .shortcut-row .key-sep { color: #9aa0a6; font-size: 10px; line-height: 20px; }
+    .shortcut-row .not-set { color: #9aa0a6; font-size: 11px; font-style: italic; }
+
+    .info { padding: 0 16px 16px; font-size: 11px; color: #5f6368; text-align: center; }
+    .info a { color: #4285f4; text-decoration: none; cursor: pointer; }
+    .info a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Markdown 文件管理器</h1>
+    <p>浏览、查看、编辑本地 Markdown / HTML 文件</p>
+  </div>
+  <div class="actions">
+    <button class="btn btn-primary" id="openEditor">打开编辑器工作区</button>
+    <button class="btn btn-secondary" id="openFolder">快速打开文件夹</button>
+  </div>
+  <div class="shortcuts-section">
+    <div class="shortcuts-title">快捷键</div>
+    <div id="shortcutRows"></div>
+  </div>
+  <div class="info">
+    <a id="openSettings">自定义快捷键设置</a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
