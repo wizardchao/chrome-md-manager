@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown 文件管理器</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <!-- Top Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button id="btnOpenFolder" class="tool-btn primary" title="打开文件夹">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3.5A1.5 1.5 0 012.5 2h3.879a1.5 1.5 0 011.06.44l1.122 1.12A1.5 1.5 0 009.62 4H13.5A1.5 1.5 0 0115 5.5v7a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5v-9z"/></svg>
+        打开文件夹
+      </button>
+      <button id="btnNewFile" class="tool-btn" title="新建文件" disabled>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a.5.5 0 01.5.5v5h5a.5.5 0 010 1h-5v5a.5.5 0 01-1 0v-5h-5a.5.5 0 010-1h5v-5A.5.5 0 018 2z"/></svg>
+        新建
+      </button>
+      <button id="btnNewFolder" class="tool-btn" title="新建文件夹" disabled>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M9.828 3h3.982a2 2 0 011.992 2.181l-.637 7A2 2 0 0113.174 14H2.826a2 2 0 01-1.991-1.819l-.637-7a1.99 1.99 0 01.342-1.31L2.5 3h3.672a2 2 0 011.414.586l.828.828A2 2 0 009.828 3zM8 7a.5.5 0 00-.5.5v1h-1a.5.5 0 000 1h1v1a.5.5 0 001 0v-1h1a.5.5 0 000-1h-1v-1A.5.5 0 008 7z"/></svg>
+        新建文件夹
+      </button>
+      <div class="separator"></div>
+      <button id="btnSave" class="tool-btn" title="保存 (Ctrl+S)" disabled>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 1a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4.414A1 1 0 0014.707 4L12 1.293A1 1 0 0011.586 1H2zm3 3a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-5A.5.5 0 015 6V4zm0 7a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-5a.5.5 0 01-.5-.5v-2z"/></svg>
+        保存
+      </button>
+      <button id="btnDelete" class="tool-btn danger" title="删除文件" disabled>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+        删除
+      </button>
+    </div>
+    <div class="toolbar-right">
+      <div class="view-toggle">
+        <button id="btnViewEdit" class="toggle-btn active" title="编辑模式">编辑</button>
+        <button id="btnViewPreview" class="toggle-btn" title="预览模式">预览</button>
+        <button id="btnViewSplit" class="toggle-btn" title="分屏模式">分屏</button>
+      </div>
+      <button class="theme-toggle" id="btnThemeToggle" title="切换白天/黑夜模式">
+        <span class="theme-icon" id="themeIcon">&#9728;&#65039;</span>
+        <span class="theme-label" id="themeLabel">浅色</span>
+        <span class="theme-auto-badge" id="themeAutoBadge" style="display:none;">自动</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Sidebar: File Tree -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title" id="folderName">未打开文件夹</span>
+        <button class="icon-btn" id="btnRefresh" title="刷新" disabled>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.418A6 6 0 118 2v1z"/><path d="M8 4.466V.534a.25.25 0 01.41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 018 4.466z"/></svg>
+        </button>
+      </div>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="搜索文件..." disabled>
+      </div>
+      <div class="file-tree" id="fileTree">
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 16 16" fill="#dadce0"><path d="M1 3.5A1.5 1.5 0 012.5 2h3.879a1.5 1.5 0 011.06.44l1.122 1.12A1.5 1.5 0 009.62 4H13.5A1.5 1.5 0 0115 5.5v7a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5v-9z"/></svg>
+          <p>点击「打开文件夹」选择一个本地目录</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resize Handle -->
+    <div class="resize-handle" id="resizeHandle"></div>
+
+    <!-- Editor Area -->
+    <div class="editor-area">
+      <div class="editor-tabs" id="editorTabs"></div>
+      <div class="editor-content">
+        <div class="edit-pane" id="editPane">
+          <textarea id="markdownInput" placeholder="在此输入 Markdown / HTML 内容..." disabled></textarea>
+        </div>
+        <div class="preview-pane" id="previewPane" style="display:none;">
+          <div class="markdown-body" id="markdownPreview">
+            <div class="empty-state">
+              <p>选择一个 Markdown 文件开始编辑</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Format Toolbar (shown in edit mode) -->
+      <div class="format-bar" id="formatBar">
+        <button class="fmt-btn" data-action="bold" title="加粗 (Ctrl+B)"><b>B</b></button>
+        <button class="fmt-btn" data-action="italic" title="斜体 (Ctrl+I)"><i>I</i></button>
+        <button class="fmt-btn" data-action="strikethrough" title="删除线"><s>S</s></button>
+        <span class="fmt-sep"></span>
+        <button class="fmt-btn" data-action="h1" title="标题1">H1</button>
+        <button class="fmt-btn" data-action="h2" title="标题2">H2</button>
+        <button class="fmt-btn" data-action="h3" title="标题3">H3</button>
+        <span class="fmt-sep"></span>
+        <button class="fmt-btn" data-action="ul" title="无序列表">&#8226; 列表</button>
+        <button class="fmt-btn" data-action="ol" title="有序列表">1. 列表</button>
+        <button class="fmt-btn" data-action="task" title="任务列表">&#9745; 任务</button>
+        <span class="fmt-sep"></span>
+        <button class="fmt-btn" data-action="code" title="行内代码">&lt;/&gt;</button>
+        <button class="fmt-btn" data-action="codeblock" title="代码块">代码块</button>
+        <button class="fmt-btn" data-action="link" title="链接">链接</button>
+        <button class="fmt-btn" data-action="image" title="图片">图片</button>
+        <button class="fmt-btn" data-action="table" title="表格">表格</button>
+        <button class="fmt-btn" data-action="hr" title="分割线">——</button>
+        <button class="fmt-btn" data-action="quote" title="引用">引用</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialogs -->
+  <div class="modal-overlay" id="modalOverlay" style="display:none;">
+    <div class="modal" id="modal">
+      <div class="modal-header" id="modalHeader">对话框</div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel" id="modalCancel">取消</button>
+        <button class="btn btn-confirm" id="modalConfirm">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="libs/marked.min.js"></script>
+  <script src="libs/highlight.min.js"></script>
+  <script src="editor.js"></script>
+</body>
+</html>
