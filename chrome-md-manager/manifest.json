@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "Markdown 文件管理器",
+  "version": "1.1.0",
+  "description": "在浏览器中打开本地文件夹，查看、编辑、删除、新增 Markdown 和 HTML 文件",
+  "permissions": ["storage", "sidePanel"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "commands": {
+    "open-editor": {
+      "suggested_key": {
+        "default": "Alt+M",
+        "mac": "Alt+M"
+      },
+      "description": "打开 Markdown 编辑器"
+    },
+    "open-editor-with-folder": {
+      "suggested_key": {
+        "default": "Alt+Shift+M",
+        "mac": "Alt+Shift+M"
+      },
+      "description": "打开编辑器并选择文件夹"
+    },
+    "quick-new-file": {
+      "suggested_key": {
+        "default": "Alt+N",
+        "mac": "Alt+N"
+      },
+      "description": "快速新建 Markdown 文件"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
