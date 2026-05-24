@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Markdown 文件管理插件 - 技术评估报告</title>
+    <style>
+        :root {
+            --primary: #4285f4;
+            --success: #34a853;
+            --warning: #fbbc04;
+            --danger: #ea4335;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 50%, #fbbc04 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.4em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero p {
+            font-size: 1.15em;
+            opacity: 0.92;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 32px;
+            margin-bottom: 28px;
+            border: 1px solid var(--border);
+        }
+
+        .section h2 {
+            font-size: 1.5em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2 .icon {
+            font-size: 1.2em;
+        }
+
+        h3 {
+            font-size: 1.15em;
+            color: var(--text);
+            margin: 20px 0 10px;
+        }
+
+        p, li {
+            color: var(--text-secondary);
+            font-size: 0.97em;
+        }
+
+        ul, ol {
+            padding-left: 24px;
+            margin: 8px 0;
+        }
+
+        li { margin: 6px 0; }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-top: 16px;
+        }
+
+        .feature-card {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: transform 0.15s;
+        }
+
+        .feature-card:hover { transform: translateY(-2px); }
+
+        .feature-card .emoji {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .feature-card h4 {
+            font-size: 1.05em;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .feature-card p {
+            font-size: 0.88em;
+            line-height: 1.5;
+        }
+
+        /* Tech Stack Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.93em;
+        }
+
+        thead th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        thead th:first-child { border-radius: 8px 0 0 0; }
+        thead th:last-child { border-radius: 0 8px 0 0; }
+
+        tbody td {
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tbody tr:hover { background: #f1f3f4; }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.78em;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-core { background: var(--primary); }
+        .badge-important { background: var(--success); }
+        .badge-optional { background: var(--warning); color: #333; }
+        .badge-high { background: var(--danger); }
+        .badge-medium { background: var(--warning); color: #333; }
+        .badge-low { background: var(--success); }
+
+        /* Cost Table */
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cost-row:last-child { border-bottom: none; }
+
+        .cost-label {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .cost-value {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .cost-total {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border-radius: 10px;
+            padding: 20px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .cost-total .cost-label { color: white; font-size: 1.1em; }
+        .cost-total .cost-value { color: white; font-size: 1.5em; }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin: 16px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary), var(--success));
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .timeline-item h4 {
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .timeline-item p {
+            font-size: 0.9em;
+        }
+
+        .timeline-item .duration {
+            display: inline-block;
+            background: #e8f0fe;
+            color: var(--primary);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.82em;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Risk */
+        .risk-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .risk-item.high { border-left-color: var(--danger); }
+        .risk-item.low { border-left-color: var(--success); }
+
+        .risk-content h4 { font-size: 0.95em; margin-bottom: 4px; }
+        .risk-content p { font-size: 0.87em; }
+
+        /* Architecture Diagram */
+        .arch-diagram {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            border-radius: 10px;
+            padding: 28px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 16px 0;
+            white-space: pre;
+        }
+
+        .arch-diagram .comment { color: #6a9955; }
+        .arch-diagram .highlight { color: #4fc1ff; }
+        .arch-diagram .keyword { color: #c586c0; }
+        .arch-diagram .string { color: #ce9178; }
+
+        /* API Comparison */
+        .api-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .api-card {
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+        }
+
+        .api-card.recommended {
+            border-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        .api-card h4 {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .api-card ul { padding-left: 18px; }
+
+        /* Summary Box */
+        .summary-box {
+            background: linear-gradient(135deg, #e8f0fe, #e6f4ea);
+            border-radius: 12px;
+            padding: 28px;
+            margin-top: 16px;
+        }
+
+        .summary-box h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 0.88em;
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 40px 20px; }
+            .hero h1 { font-size: 1.6em; }
+            .container { padding: 20px 14px; }
+            .section { padding: 20px; }
+            .api-compare { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>Chrome Markdown 文件管理插件</h1>
+    <p>技术可行性评估与实现成本分析报告</p>
+</div>
+
+<div class="container">
+
+    <!-- 1. 项目概述 -->
+    <div class="section">
+        <h2><span class="icon">📋</span> 一、项目概述</h2>
+        <p>开发一个 Chrome 浏览器扩展，允许用户直接在浏览器中打开本地文件/文件夹，对 Markdown（.md）文件进行查看、编辑、删除和新增操作。</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="emoji">📂</span>
+                <h4>打开文件/文件夹</h4>
+                <p>通过浏览器打开本地目录，浏览文件树结构，支持拖拽打开</p>
+            </div>
+            <div class="feature-card">
+                <span class="emoji">👁️</span>
+                <h4>查看 Markdown</h4>
+                <p>实时渲染 Markdown 为 HTML，支持 GFM 语法、代码高亮、数学公式</p>
+            </div>
+            <div class="feature-card">
+                <span class="emoji">✏️</span>
+                <h4>编辑 Markdown</h4>
+                <p>所见即所得编辑器，支持实时预览、工具栏、快捷键</p>
+            </div>
+            <div class="feature-card">
+                <span class="emoji">🗑️</span>
+                <h4>删除文件</h4>
+                <p>安全删除确认，支持批量操作</p>
+            </div>
+            <div class="feature-card">
+                <span class="emoji">➕</span>
+                <h4>新增文件</h4>
+                <p>创建新 Markdown 文件，支持模板选择</p>
+            </div>
+            <div class="feature-card">
+                <span class="emoji">🔍</span>
+                <h4>搜索与筛选</h4>
+                <p>按文件名或内容搜索，快速定位目标文件</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 核心技术挑战 -->
+    <div class="section">
+        <h2><span class="icon">⚠️</span> 二、核心技术挑战 — 浏览器文件系统访问</h2>
+        <p>Chrome 扩展访问本地文件系统是该项目的<strong>最大技术挑战</strong>。浏览器出于安全沙箱限制，不能直接随意读写本地文件。以下是可选方案对比：</p>
+
+        <div class="api-compare">
+            <div class="api-card recommended">
+                <h4>✅ 方案 A：File System Access API（推荐）</h4>
+                <ul>
+                    <li><strong>原理：</strong>W3C 标准 API，Chrome 86+ 支持</li>
+                    <li><strong>能力：</strong>读取、写入、删除文件与目录</li>
+                    <li><strong>权限：</strong>用户主动选择目录后授权，可持久化权限</li>
+                    <li><strong>优点：</strong>无需额外安装，纯前端实现</li>
+                    <li><strong>缺点：</strong>首次需用户手动选择目录；仅限 Chromium 内核浏览器</li>
+                    <li><strong>API：</strong><code>showDirectoryPicker()</code>、<code>FileSystemDirectoryHandle</code></li>
+                </ul>
+            </div>
+            <div class="api-card">
+                <h4>🔧 方案 B：Native Messaging + 本地服务</h4>
+                <ul>
+                    <li><strong>原理：</strong>Chrome 扩展通过 Native Messaging 调用本地程序</li>
+                    <li><strong>能力：</strong>完整的文件系统访问权限</li>
+                    <li><strong>权限：</strong>需用户安装 Native Host 程序</li>
+                    <li><strong>优点：</strong>无文件系统限制，可后台监听变更</li>
+                    <li><strong>缺点：</strong>需额外安装本地程序，增加部署复杂度</li>
+                    <li><strong>适用：</strong>需要监听文件变更、深度集成的高级场景</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>方案选择建议</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>维度</th>
+                    <th>File System Access API</th>
+                    <th>Native Messaging</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>安装复杂度</td>
+                    <td><span class="badge badge-low">低</span> 仅装插件</td>
+                    <td><span class="badge badge-high">高</span> 插件 + 本地程序</td>
+                </tr>
+                <tr>
+                    <td>文件读写</td>
+                    <td>✅ 完整支持</td>
+                    <td>✅ 完整支持</td>
+                </tr>
+                <tr>
+                    <td>文件删除</td>
+                    <td>✅ <code>removeEntry()</code></td>
+                    <td>✅ 原生 fs 操作</td>
+                </tr>
+                <tr>
+                    <td>目录遍历</td>
+                    <td>✅ 异步迭代器</td>
+                    <td>✅ 原生 fs 操作</td>
+                </tr>
+                <tr>
+                    <td>文件监听</td>
+                    <td>❌ 不支持</td>
+                    <td>✅ fs.watch</td>
+                </tr>
+                <tr>
+                    <td>跨平台分发</td>
+                    <td><span class="badge badge-low">简单</span></td>
+                    <td><span class="badge badge-high">需各平台打包</span></td>
+                </tr>
+                <tr>
+                    <td>开发成本</td>
+                    <td><span class="badge badge-low">低</span></td>
+                    <td><span class="badge badge-medium">中高</span></td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>结论：推荐方案 A（File System Access API）</strong>，满足全部核心需求，零额外安装成本，开发周期短。</p>
+    </div>
+
+    <!-- 3. 技术架构 -->
+    <div class="section">
+        <h2><span class="icon">🏗️</span> 三、技术架构设计</h2>
+
+        <div class="arch-diagram"><span class="comment">┌─────────────────────────────────────────────────────────────────┐</span>
+<span class="comment">│                    Chrome Extension (Manifest V3)               │</span>
+<span class="comment">├─────────────────────────────────────────────────────────────────┤</span>
+<span class="comment">│                                                                 │</span>
+<span class="comment">│  ┌──────────────┐   ┌──────────────┐   ┌──────────────────┐    │</span>
+<span class="highlight">│  │  Popup UI    │   │  Side Panel  │   │  New Tab Page    │    │</span>
+<span class="comment">│  │  快速操作入口  │   │  文件树浏览   │   │  主编辑工作区     │    │</span>
+<span class="comment">│  └──────┬───────┘   └──────┬───────┘   └────────┬─────────┘    │</span>
+<span class="comment">│         │                  │                    │              │</span>
+<span class="comment">│         └──────────────────┼────────────────────┘              │</span>
+<span class="comment">│                            │                                   │</span>
+<span class="comment">│                  ┌─────────▼─────────┐                         │</span>
+<span class="keyword">│                  │  Service Worker   │                         │</span>
+<span class="comment">│                  │  (Background)     │                         │</span>
+<span class="comment">│                  │  - 消息路由        │                         │</span>
+<span class="comment">│                  │  - 权限管理        │                         │</span>
+<span class="comment">│                  │  - 状态缓存        │                         │</span>
+<span class="comment">│                  └─────────┬─────────┘                         │</span>
+<span class="comment">│                            │                                   │</span>
+<span class="comment">│                  ┌─────────▼─────────┐                         │</span>
+<span class="string">│                  │  File System      │                         │</span>
+<span class="string">│                  │  Access API       │                         │</span>
+<span class="comment">│                  │  - 目录选择/遍历   │                         │</span>
+<span class="comment">│                  │  - 文件读写/删除   │                         │</span>
+<span class="comment">│                  │  - 权限持久化      │                         │</span>
+<span class="comment">│                  └───────────────────┘                         │</span>
+<span class="comment">│                                                                 │</span>
+<span class="comment">├─────────────────────────────────────────────────────────────────┤</span>
+<span class="comment">│  核心依赖库                                                     │</span>
+<span class="comment">│  ┌──────────┐ ┌───────────┐ ┌──────────┐ ┌──────────────────┐  │</span>
+<span class="highlight">│  │ marked   │ │ CodeMirror│ │highlight │ │ IndexedDB/Cache  │  │</span>
+<span class="comment">│  │ MD→HTML  │ │ 代码编辑器 │ │ 代码高亮  │ │ 本地缓存         │  │</span>
+<span class="comment">│  └──────────┘ └───────────┘ └──────────┘ └──────────────────┘  │</span>
+<span class="comment">└─────────────────────────────────────────────────────────────────┘</span></div>
+
+        <h3>技术栈选型</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>层次</th>
+                    <th>技术选型</th>
+                    <th>说明</th>
+                    <th>优先级</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>扩展框架</td>
+                    <td>Chrome Extension Manifest V3</td>
+                    <td>Chrome 最新扩展标准，必须使用</td>
+                    <td><span class="badge badge-core">核心</span></td>
+                </tr>
+                <tr>
+                    <td>前端框架</td>
+                    <td>React 18 / Vue 3 / Vanilla</td>
+                    <td>推荐 React + TypeScript，生态丰富</td>
+                    <td><span class="badge badge-core">核心</span></td>
+                </tr>
+                <tr>
+                    <td>构建工具</td>
+                    <td>Vite + CRXJS 或 Plasmo</td>
+                    <td>专为 Chrome 扩展优化的开发工具链</td>
+                    <td><span class="badge badge-core">核心</span></td>
+                </tr>
+                <tr>
+                    <td>Markdown 解析</td>
+                    <td>marked / markdown-it</td>
+                    <td>MD→HTML 渲染，支持 GFM 扩展</td>
+                    <td><span class="badge badge-core">核心</span></td>
+                </tr>
+                <tr>
+                    <td>代码编辑器</td>
+                    <td>CodeMirror 6</td>
+                    <td>轻量高性能编辑器，支持 Markdown 语法高亮</td>
+                    <td><span class="badge badge-core">核心</span></td>
+                </tr>
+                <tr>
+                    <td>代码高亮</td>
+                    <td>highlight.js / Shiki</td>
+                    <td>代码块语法高亮</td>
+                    <td><span class="badge badge-important">重要</span></td>
+                </tr>
+                <tr>
+                    <td>文件系统</td>
+                    <td>File System Access API</td>
+                    <td>浏览器原生 API，读写本地文件</td>
+                    <td><span class="badge badge-core">核心</span></td>
+                </tr>
+                <tr>
+                    <td>状态管理</td>
+                    <td>Zustand / chrome.storage</td>
+                    <td>扩展内状态管理和持久化</td>
+                    <td><span class="badge badge-important">重要</span></td>
+                </tr>
+                <tr>
+                    <td>样式方案</td>
+                    <td>Tailwind CSS / CSS Modules</td>
+                    <td>快速构建美观 UI</td>
+                    <td><span class="badge badge-optional">可选</span></td>
+                </tr>
+                <tr>
+                    <td>数学公式</td>
+                    <td>KaTeX</td>
+                    <td>渲染 LaTeX 数学公式</td>
+                    <td><span class="badge badge-optional">可选</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 4. 功能模块详细设计 -->
+    <div class="section">
+        <h2><span class="icon">🧩</span> 四、功能模块详细设计</h2>
+
+        <h3>4.1 文件/文件夹打开模块</h3>
+        <table>
+            <thead><tr><th>功能点</th><th>实现方式</th><th>难度</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>选择目录</td>
+                    <td><code>window.showDirectoryPicker()</code> 弹出系统目录选择</td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>递归遍历文件树</td>
+                    <td><code>dirHandle.entries()</code> 异步迭代，过滤 .md 文件</td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>权限持久化</td>
+                    <td>IndexedDB 存储 <code>FileSystemDirectoryHandle</code>，下次免选择</td>
+                    <td><span class="badge badge-medium">中</span></td>
+                </tr>
+                <tr>
+                    <td>拖拽打开</td>
+                    <td><code>DataTransferItem.getAsFileSystemHandle()</code></td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>4.2 Markdown 查看模块</h3>
+        <table>
+            <thead><tr><th>功能点</th><th>实现方式</th><th>难度</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>MD 渲染</td>
+                    <td>marked / markdown-it 解析为 HTML</td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>GFM 支持</td>
+                    <td>表格、任务列表、删除线等 GitHub 风格扩展</td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>代码高亮</td>
+                    <td>highlight.js 自动检测语言并着色</td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>目录导航（TOC）</td>
+                    <td>提取标题层级生成侧边目录</td>
+                    <td><span class="badge badge-medium">中</span></td>
+                </tr>
+                <tr>
+                    <td>图片预览</td>
+                    <td>解析相对路径图片，通过 File System API 读取并转 Blob URL</td>
+                    <td><span class="badge badge-medium">中</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>4.3 Markdown 编辑模块</h3>
+        <table>
+            <thead><tr><th>功能点</th><th>实现方式</th><th>难度</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>源码编辑器</td>
+                    <td>CodeMirror 6 + Markdown 语言扩展</td>
+                    <td><span class="badge badge-medium">中</span></td>
+                </tr>
+                <tr>
+                    <td>实时预览</td>
+                    <td>分屏布局，编辑区与预览区同步滚动</td>
+                    <td><span class="badge badge-medium">中</span></td>
+                </tr>
+                <tr>
+                    <td>工具栏</td>
+                    <td>加粗、斜体、链接、图片、表格等快捷按钮</td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>自动保存</td>
+                    <td>debounce 300ms 后调用 <code>writable.write()</code></td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>快捷键</td>
+                    <td>Ctrl+S 保存、Ctrl+B 加粗等常用快捷键</td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>4.4 文件管理模块（新增 / 删除）</h3>
+        <table>
+            <thead><tr><th>功能点</th><th>实现方式</th><th>难度</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>新增文件</td>
+                    <td><code>dirHandle.getFileHandle(name, { create: true })</code></td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>新增文件夹</td>
+                    <td><code>dirHandle.getDirectoryHandle(name, { create: true })</code></td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>删除文件</td>
+                    <td><code>dirHandle.removeEntry(name)</code></td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>删除文件夹</td>
+                    <td><code>dirHandle.removeEntry(name, { recursive: true })</code></td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+                <tr>
+                    <td>重命名</td>
+                    <td>File System Access API 不支持直接重命名，需复制+删除</td>
+                    <td><span class="badge badge-medium">中</span></td>
+                </tr>
+                <tr>
+                    <td>安全确认</td>
+                    <td>删除操作弹出二次确认对话框</td>
+                    <td><span class="badge badge-low">低</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 5. 关键代码示例 -->
+    <div class="section">
+        <h2><span class="icon">💻</span> 五、关键代码示例</h2>
+
+        <h3>5.1 manifest.json (Manifest V3)</h3>
+        <div class="arch-diagram">{
+  <span class="string">"manifest_version"</span>: 3,
+  <span class="string">"name"</span>: <span class="string">"Markdown File Manager"</span>,
+  <span class="string">"version"</span>: <span class="string">"1.0.0"</span>,
+  <span class="string">"description"</span>: <span class="string">"Browse, view, edit, and manage local Markdown files"</span>,
+  <span class="string">"permissions"</span>: [<span class="string">"storage"</span>, <span class="string">"sidePanel"</span>],
+  <span class="string">"action"</span>: {
+    <span class="string">"default_popup"</span>: <span class="string">"popup.html"</span>,
+    <span class="string">"default_icon"</span>: <span class="string">"icons/icon128.png"</span>
+  },
+  <span class="string">"side_panel"</span>: {
+    <span class="string">"default_path"</span>: <span class="string">"sidepanel.html"</span>
+  },
+  <span class="string">"background"</span>: {
+    <span class="string">"service_worker"</span>: <span class="string">"background.js"</span>
+  },
+  <span class="string">"chrome_url_overrides"</span>: {
+    <span class="string">"newtab"</span>: <span class="string">"newtab.html"</span>
+  }
+}</div>
+
+        <h3>5.2 文件系统核心操作</h3>
+        <div class="arch-diagram"><span class="comment">// 打开目录并遍历 Markdown 文件</span>
+<span class="keyword">async function</span> <span class="highlight">openDirectory</span>() {
+  <span class="keyword">const</span> dirHandle = <span class="keyword">await</span> window.showDirectoryPicker();
+  <span class="keyword">const</span> files = [];
+  <span class="keyword">await</span> <span class="highlight">scanDirectory</span>(dirHandle, <span class="string">''</span>, files);
+  <span class="keyword">return</span> { dirHandle, files };
+}
+
+<span class="keyword">async function</span> <span class="highlight">scanDirectory</span>(dirHandle, path, results) {
+  <span class="keyword">for await</span> (<span class="keyword">const</span> [name, handle] <span class="keyword">of</span> dirHandle.entries()) {
+    <span class="keyword">const</span> fullPath = path ? <span class="string">`${path}/${name}`</span> : name;
+    <span class="keyword">if</span> (handle.kind === <span class="string">'directory'</span>) {
+      <span class="keyword">await</span> <span class="highlight">scanDirectory</span>(handle, fullPath, results);
+    } <span class="keyword">else if</span> (name.endsWith(<span class="string">'.md'</span>)) {
+      results.push({ name, path: fullPath, handle });
+    }
+  }
+}
+
+<span class="comment">// 读取文件内容</span>
+<span class="keyword">async function</span> <span class="highlight">readFile</span>(fileHandle) {
+  <span class="keyword">const</span> file = <span class="keyword">await</span> fileHandle.getFile();
+  <span class="keyword">return await</span> file.text();
+}
+
+<span class="comment">// 写入文件内容</span>
+<span class="keyword">async function</span> <span class="highlight">writeFile</span>(fileHandle, content) {
+  <span class="keyword">const</span> writable = <span class="keyword">await</span> fileHandle.createWritable();
+  <span class="keyword">await</span> writable.write(content);
+  <span class="keyword">await</span> writable.close();
+}
+
+<span class="comment">// 新增文件</span>
+<span class="keyword">async function</span> <span class="highlight">createFile</span>(dirHandle, fileName) {
+  <span class="keyword">const</span> fileHandle = <span class="keyword">await</span> dirHandle.getFileHandle(
+    fileName, { create: <span class="keyword">true</span> }
+  );
+  <span class="keyword">return</span> fileHandle;
+}
+
+<span class="comment">// 删除文件</span>
+<span class="keyword">async function</span> <span class="highlight">deleteFile</span>(dirHandle, fileName) {
+  <span class="keyword">await</span> dirHandle.removeEntry(fileName);
+}</div>
+    </div>
+
+    <!-- 6. 开发周期 -->
+    <div class="section">
+        <h2><span class="icon">📅</span> 六、开发周期规划</h2>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>阶段 1：项目搭建与文件系统</h4>
+                <p>Manifest V3 脚手架搭建、File System Access API 封装、目录选择与文件树遍历、权限持久化</p>
+                <span class="duration">3-4 天</span>
+            </div>
+            <div class="timeline-item">
+                <h4>阶段 2：Markdown 查看器</h4>
+                <p>Markdown 解析渲染、代码高亮、GFM 扩展支持、目录导航、样式美化</p>
+                <span class="duration">2-3 天</span>
+            </div>
+            <div class="timeline-item">
+                <h4>阶段 3：Markdown 编辑器</h4>
+                <p>CodeMirror 6 集成、实时预览分屏、工具栏与快捷键、自动保存机制</p>
+                <span class="duration">3-4 天</span>
+            </div>
+            <div class="timeline-item">
+                <h4>阶段 4：文件管理操作</h4>
+                <p>新增/删除/重命名、批量操作、安全确认对话框、错误处理</p>
+                <span class="duration">2-3 天</span>
+            </div>
+            <div class="timeline-item">
+                <h4>阶段 5：UI 完善与测试</h4>
+                <p>响应式布局、暗色主题、用户设置、全面测试与 Bug 修复</p>
+                <span class="duration">3-4 天</span>
+            </div>
+            <div class="timeline-item">
+                <h4>阶段 6：发布准备</h4>
+                <p>Chrome Web Store 上架材料、隐私政策、截图制作、审核提交</p>
+                <span class="duration">1-2 天</span>
+            </div>
+        </div>
+
+        <div class="cost-total" style="background: #e8f0fe; margin-top: 20px;">
+            <span class="cost-label" style="color: var(--primary);">总开发周期（1人）</span>
+            <span class="cost-value" style="color: var(--primary);">14 - 20 天</span>
+        </div>
+    </div>
+
+    <!-- 7. 成本评估 -->
+    <div class="section">
+        <h2><span class="icon">💰</span> 七、成本评估</h2>
+
+        <h3>7.1 开发人力成本</h3>
+        <table>
+            <thead>
+                <tr><th>角色</th><th>工作量</th><th>日薪参考（人民币）</th><th>费用</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>前端开发（独立开发者）</td>
+                    <td>15-20 人天</td>
+                    <td>1,000 - 2,000</td>
+                    <td>15,000 - 40,000</td>
+                </tr>
+                <tr>
+                    <td>UI 设计（可选外包）</td>
+                    <td>3-5 人天</td>
+                    <td>800 - 1,500</td>
+                    <td>2,400 - 7,500</td>
+                </tr>
+                <tr>
+                    <td>测试</td>
+                    <td>2-3 人天</td>
+                    <td>500 - 1,000</td>
+                    <td>1,000 - 3,000</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>7.2 其他成本</h3>
+        <div class="cost-row">
+            <span class="cost-label">Chrome Web Store 开发者注册费</span>
+            <span class="cost-value">$5（一次性）</span>
+        </div>
+        <div class="cost-row">
+            <span class="cost-label">域名（官网/文档站，可选）</span>
+            <span class="cost-value">~￥60/年</span>
+        </div>
+        <div class="cost-row">
+            <span class="cost-label">第三方库/依赖</span>
+            <span class="cost-value">￥0（全部开源免费）</span>
+        </div>
+        <div class="cost-row">
+            <span class="cost-label">服务器（纯前端无需后端）</span>
+            <span class="cost-value">￥0</span>
+        </div>
+
+        <div class="cost-total">
+            <span class="cost-label">总成本估算</span>
+            <span class="cost-value">￥18,000 - ￥50,000</span>
+        </div>
+        <p style="margin-top: 12px; font-size: 0.9em;"><strong>注：</strong>若开发者自行全栈开发，仅需 Chrome Web Store 注册费 $5，人力成本为自身时间投入。使用 AI 辅助编程可节省 40-60% 开发时间。</p>
+    </div>
+
+    <!-- 8. 风险与挑战 -->
+    <div class="section">
+        <h2><span class="icon">🛡️</span> 八、风险与应对策略</h2>
+
+        <div class="risk-item high">
+            <div class="risk-content">
+                <h4><span class="badge badge-high">高</span> File System Access API 兼容性</h4>
+                <p><strong>风险：</strong>该 API 仅 Chromium 内核浏览器支持（Chrome、Edge），Firefox/Safari 不支持。<br>
+                <strong>应对：</strong>明确定位为 Chrome 扩展，在说明中标注浏览器要求；降级方案使用 &lt;input type="file"&gt; 支持单文件打开。</p>
+            </div>
+        </div>
+
+        <div class="risk-item">
+            <div class="risk-content">
+                <h4><span class="badge badge-medium">中</span> 权限持久化可能失效</h4>
+                <p><strong>风险：</strong>浏览器关闭后 File System Handle 权限可能被回收，用户需重新授权。<br>
+                <strong>应对：</strong>使用 IndexedDB 持久化 Handle，启动时调用 <code>queryPermission()</code> 检查，必要时调用 <code>requestPermission()</code> 重新授权，交互成本仅一次点击。</p>
+            </div>
+        </div>
+
+        <div class="risk-item">
+            <div class="risk-content">
+                <h4><span class="badge badge-medium">中</span> 大文件/大目录性能</h4>
+                <p><strong>风险：</strong>包含数千文件的目录遍历可能卡顿。<br>
+                <strong>应对：</strong>懒加载文件树（仅展开时遍历子目录）、Web Worker 处理 Markdown 解析、虚拟列表渲染。</p>
+            </div>
+        </div>
+
+        <div class="risk-item low">
+            <div class="risk-content">
+                <h4><span class="badge badge-low">低</span> Chrome Web Store 审核</h4>
+                <p><strong>风险：</strong>插件可能因权限描述不清被拒。<br>
+                <strong>应对：</strong>详细说明权限用途，提供隐私政策，录制功能演示视频。</p>
+            </div>
+        </div>
+
+        <div class="risk-item low">
+            <div class="risk-content">
+                <h4><span class="badge badge-low">低</span> Manifest V3 限制</h4>
+                <p><strong>风险：</strong>MV3 中 Service Worker 生命周期有限，不能长驻后台。<br>
+                <strong>应对：</strong>文件操作在前端页面（Side Panel / New Tab）中执行，不依赖 Service Worker 保持状态。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. 竞品参考 -->
+    <div class="section">
+        <h2><span class="icon">🔍</span> 九、竞品与差异化分析</h2>
+        <table>
+            <thead>
+                <tr><th>产品</th><th>形态</th><th>本地文件</th><th>编辑</th><th>差异化机会</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Markdown Viewer (Chrome)</td>
+                    <td>Chrome 扩展</td>
+                    <td>仅查看</td>
+                    <td>❌</td>
+                    <td>我们支持编辑 + 文件管理</td>
+                </tr>
+                <tr>
+                    <td>StackEdit</td>
+                    <td>Web 应用</td>
+                    <td>通过云同步</td>
+                    <td>✅</td>
+                    <td>我们直接操作本地文件，无需云服务</td>
+                </tr>
+                <tr>
+                    <td>Typora</td>
+                    <td>桌面应用</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>我们零安装成本，浏览器内即用</td>
+                </tr>
+                <tr>
+                    <td>Obsidian</td>
+                    <td>桌面应用</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>我们轻量级，无需安装独立应用</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 10. 总结 -->
+    <div class="section">
+        <h2><span class="icon">✅</span> 十、总结与建议</h2>
+
+        <div class="summary-box">
+            <h3>可行性结论：完全可行</h3>
+            <ul>
+                <li><strong>技术上</strong> — File System Access API 提供了完整的本地文件读写能力，配合 Manifest V3 可实现全部需求，无需后端服务器。</li>
+                <li><strong>成本上</strong> — 纯前端项目，依赖全部开源免费，独立开发者仅需投入 2-3 周时间 + $5 注册费。</li>
+                <li><strong>体验上</strong> — 浏览器内直接使用，零安装成本（对用户而言），填补了「浏览器内本地 Markdown 文件管理」的市场空白。</li>
+            </ul>
+
+            <h3 style="margin-top: 20px;">推荐实施路径</h3>
+            <ol>
+                <li><strong>MVP（最小可行产品）</strong>：先实现打开目录 + 查看 + 基础编辑，约 1 周可完成</li>
+                <li><strong>V1.0</strong>：加入完整编辑器、文件管理、UI 美化，约 2-3 周完成</li>
+                <li><strong>V2.0</strong>：考虑增加 Git 集成、多标签页编辑、插件主题系统等高级功能</li>
+            </ol>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>Chrome Markdown 文件管理插件 - 技术评估报告 | 生成日期：2026-05-23</p>
+</div>
+
+</body>
+</html>
