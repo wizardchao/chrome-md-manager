@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown 编辑器 - 快捷键设置</title>
+  <style>
+    :root {
+      --bg: #ffffff; --bg-s: #f8f9fa; --bg-h: #f1f3f4;
+      --text: #202124; --text-s: #5f6368; --border: #dadce0;
+      --primary: #4285f4; --primary-d: #1a73e8;
+      --success: #34a853; --warning: #fbbc04; --danger: #ea4335;
+    }
+    [data-theme="dark"] {
+      --bg: #1e1e1e; --bg-s: #252526; --bg-h: #2a2d2e;
+      --text: #cccccc; --text-s: #9d9d9d; --border: #3c3c3c;
+      --primary: #569cd6; --primary-d: #4facfe;
+      --success: #6a9955; --warning: #cca700; --danger: #f44747;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+      background: var(--bg-s); color: var(--text); min-height: 100vh;
+    }
+    .page-header {
+      background: linear-gradient(135deg, #4285f4, #34a853);
+      color: white; padding: 32px 40px;
+    }
+    .page-header h1 { font-size: 24px; margin-bottom: 6px; }
+    .page-header p { font-size: 14px; opacity: 0.88; }
+    .container { max-width: 800px; margin: 0 auto; padding: 32px 24px; }
+
+    .card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .card h2 {
+      font-size: 17px; margin-bottom: 16px; padding-bottom: 12px;
+      border-bottom: 2px solid var(--primary); color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .shortcut-list { display: flex; flex-direction: column; gap: 14px; }
+    .shortcut-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; background: var(--bg-s); border-radius: 10px;
+      border: 1px solid var(--border); transition: all 0.15s;
+    }
+    .shortcut-item:hover { border-color: var(--primary); }
+    .shortcut-info { flex: 1; }
+    .shortcut-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 3px; }
+    .shortcut-desc { font-size: 12px; color: var(--text-s); }
+    .shortcut-keys {
+      display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 16px;
+    }
+    .key {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 32px; height: 30px; padding: 0 8px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+      font-family: 'SF Mono', Consolas, monospace; font-size: 12px; font-weight: 600;
+      color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+    .key-sep { color: var(--text-s); font-size: 12px; }
+
+    /* Current shortcut display with edit hint */
+    .shortcut-current {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .edit-hint {
+      font-size: 11px; color: var(--text-s); opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .shortcut-item:hover .edit-hint { opacity: 1; }
+
+    /* Action buttons */
+    .actions { display: flex; gap: 10px; margin-top: 8px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .btn-primary:hover { background: var(--primary-d); }
+    .btn-secondary { background: var(--bg); color: var(--text-s); }
+    .btn-secondary:hover { background: var(--bg-h); color: var(--text); }
+
+    /* Steps */
+    .steps { margin-top: 16px; }
+    .step {
+      display: flex; gap: 14px; padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; flex-shrink: 0;
+    }
+    .step-content { flex: 1; }
+    .step-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .step-desc { font-size: 13px; color: var(--text-s); line-height: 1.6; }
+    .step-desc code {
+      padding: 2px 6px; background: var(--bg-s); border: 1px solid var(--border);
+      border-radius: 4px; font-family: monospace; font-size: 12px;
+    }
+
+    .note {
+      display: flex; gap: 10px; padding: 14px; background: #fffbea;
+      border: 1px solid #f5deb3; border-radius: 8px; font-size: 13px;
+      color: #7a6000; margin-top: 16px;
+    }
+    [data-theme="dark"] .note { background: #3a3000; border-color: #554800; color: #d4b800; }
+    .note-icon { font-size: 18px; flex-shrink: 0; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      padding: 10px 24px; background: #323232; color: white; border-radius: 8px;
+      font-size: 13px; z-index: 2000; transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .footer { text-align: center; padding: 24px; color: var(--text-s); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <h1>快捷键设置</h1>
+    <p>自定义键盘快捷键，快速唤出 Markdown 编辑器</p>
+  </div>
+
+  <div class="container">
+    <!-- Current Shortcuts -->
+    <div class="card">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M8 16h8"/></svg>
+        当前快捷键
+      </h2>
+      <div class="shortcut-list" id="shortcutList">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btnOpenChromeShortcuts">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 3A1.5 1.5 0 003 4.5v7A1.5 1.5 0 004.5 13h7a1.5 1.5 0 001.5-1.5v-3a.5.5 0 011 0v3A2.5 2.5 0 0111.5 14h-7A2.5 2.5 0 012 11.5v-7A2.5 2.5 0 014.5 2h3a.5.5 0 010 1h-3z"/><path d="M10 1.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V2.707l-5.146 5.147a.5.5 0 01-.708-.708L13.293 2H10.5a.5.5 0 01-.5-.5z"/></svg>
+          修改快捷键
+        </button>
+        <button class="btn btn-secondary" id="btnResetDefaults">
+          恢复默认
+        </button>
+      </div>
+    </div>
+
+    <!-- How to Customize -->
+    <div class="card">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        如何自定义快捷键
+      </h2>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <div class="step-content">
+            <div class="step-title">打开快捷键设置页</div>
+            <div class="step-desc">点击上方「修改快捷键」按钮，或在地址栏输入 <code>chrome://extensions/shortcuts</code></div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div class="step-content">
+            <div class="step-title">找到「Markdown 文件管理器」</div>
+            <div class="step-desc">在扩展列表中找到本插件，可以看到已注册的三个快捷命令</div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div class="step-content">
+            <div class="step-title">点击输入框录入新快捷键</div>
+            <div class="step-desc">点击快捷键输入框，按下你想设置的组合键（如 <code>Ctrl+Shift+E</code>），Chrome 会自动保存</div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div class="step-content">
+            <div class="step-title">选择作用范围</div>
+            <div class="step-desc">可选「在 Chrome 中」（全局生效）或「在扩展中」（仅插件页面内）。推荐选择「在 Chrome 中」以便随时唤出</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="note-icon">&#9888;&#65039;</span>
+        <span>如果快捷键与其他扩展或浏览器自带快捷键冲突，Chrome 会提示并需要你选择其他组合键。</span>
+      </div>
+    </div>
+
+    <!-- Quick Test -->
+    <div class="card">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        快速测试
+      </h2>
+      <p style="font-size: 14px; color: var(--text-s); margin-bottom: 16px;">
+        设置完成后，在任意页面按下快捷键测试是否生效：
+      </p>
+      <div class="shortcut-list">
+        <div class="shortcut-item" id="testArea" style="justify-content: center; cursor: default;">
+          <span style="font-size: 14px; color: var(--text-s);" id="testHint">按下任意键组合检测...</span>
+          <span style="font-size: 14px; font-weight: 600; display: none;" id="testResult"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Markdown 文件管理器 v1.1.0</div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="options.js"></script>
+</body>
+</html>
